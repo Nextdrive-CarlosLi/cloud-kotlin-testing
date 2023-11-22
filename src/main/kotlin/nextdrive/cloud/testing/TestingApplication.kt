@@ -34,10 +34,11 @@ class ResourceController {
             val remainingTokens = limiter.getRemainingTokens()
             ResponseEntity.ok().header("X-Rate-Limit-Remaining", remainingTokens.toString())
                 .body("Congrats! Resource Acquired!")
-        }
-        else {
+        } else {
             val waitForRefill = limiter.getTimeToRefill()
-            ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).header("X-Rate-Limit-Retry-After-Seconds", "$waitForRefill").body("You're making too many requests! IP: $ip, please wait for $waitForRefill seconds to retry!")
+            ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header("X-Rate-Limit-Retry-After-Seconds", "$waitForRefill")
+                .body("You're making too many requests! IP: $ip, please wait for $waitForRefill seconds to retry!")
         }
     }
 }
