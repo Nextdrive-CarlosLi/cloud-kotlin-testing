@@ -26,7 +26,6 @@ class ResourceController {
     fun getResource(request: ServerHttpRequest): ResponseEntity<String> {
         // ip address as the key
         val ip = request.remoteAddress?.address.toString()
-        logger.info("$ip is making too many requests!")
 
         val limiter: RateLimiter = IpRateLimiterMap.computeIfAbsent(ip) { _ -> RateLimiter(10, 10) }
 
@@ -35,10 +34,11 @@ class ResourceController {
             ResponseEntity.ok().header("X-Rate-Limit-Remaining", remainingTokens.toString())
                 .body("Congrats! Resource Acquired!")
         } else {
+            logger.info("IP $ip is making too many requests!")
             val waitForRefill = limiter.getTimeToRefill()
             ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                 .header("X-Rate-Limit-Retry-After-Seconds", "$waitForRefill")
-                .body("You're making too many requests! IP: $ip, please wait for $waitForRefill seconds to retry!")
+                .body("You(IP: $ip) are making too many requests! Please wait for $waitForRefill seconds to retry!")
         }
     }
 }
