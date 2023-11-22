@@ -25,6 +25,4 @@ class RateLimiter(private val capacity: Long, private val ratePerMinute: Long) {
             tokens.updateAndGet { tokens: Long -> Math.min(capacity, tokens + tokensToAdd) }
         }
     }
-
-
 }
