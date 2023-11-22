@@ -30,7 +30,14 @@ class ResourceController {
 
         val limiter: RateLimiter = IpRateLimiterMap.computeIfAbsent(ip) { _ -> RateLimiter(10, 10) }
 
-        return if (limiter.tryAcquire()) ResponseEntity.ok("Congrats! Resource Acquired!")
-        else ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Too many requests!")
+        return if (limiter.tryAcquire()) {
+            val remainingTokens = limiter.getRemainingTokens()
+            ResponseEntity.ok().header("X-Rate-Limit-Remaining", remainingTokens.toString())
+                .body("Congrats! Resource Acquired!")
+        }
+        else {
+            val waitForRefill = limiter.getTimeToRefill()
+            ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).header("X-Rate-Limit-Retry-After-Seconds", "$waitForRefill").body("You're making too many requests! IP: $ip, please wait for $waitForRefill seconds to retry!")
+        }
     }
 }
