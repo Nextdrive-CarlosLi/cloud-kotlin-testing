@@ -5,6 +5,7 @@ import java.time.Duration
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.roundToInt
 
+// Simple Token bucket algorithm
 class RateLimiter(private val capacity: Long, private val ratePerMinute: Long) {
     private val logger = LoggerFactory.getLogger(javaClass)
     private val tokens: AtomicLong = AtomicLong(capacity)
