@@ -22,6 +22,10 @@ class ResourceController {
     private val IpRateLimiterMap = ConcurrentHashMap<String, RateLimiter>()
     private val logger = LoggerFactory.getLogger(javaClass)
 
+    companion object {
+        val SuccessMessage = "Congrats! Resource Acquired!"
+    }
+
     @GetMapping("/resource")
     fun getResource(request: ServerHttpRequest): ResponseEntity<String> {
         // ip address as the key
@@ -32,7 +36,7 @@ class ResourceController {
         return if (limiter.tryAcquire()) {
             val remainingTokens = limiter.getRemainingTokens()
             ResponseEntity.ok().header("X-Rate-Limit-Remaining", remainingTokens.toString())
-                .body("Congrats! Resource Acquired!")
+                .body(SuccessMessage)
         } else {
             logger.info("IP $ip is making too many requests!")
             val waitForRefill = limiter.getTimeToRefill()
