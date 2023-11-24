@@ -27,7 +27,7 @@ class ResourceController {
     }
 
     @GetMapping("/resource")
-    fun getResource(request: ServerHttpRequest): ResponseEntity<String> {
+    suspend fun getResource(request: ServerHttpRequest): ResponseEntity<String> {
         // ip address as the key
         val ip = request.remoteAddress?.address.toString()
 
